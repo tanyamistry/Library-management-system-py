@@ -139,10 +139,81 @@ class LibraryManagementSystem:
         framebutton=Frame(self.root,bd=12,relief=RIDGE,padx=20,bg="powder blue")
         framebutton.place(x=0,y=460,width=1280,height=70)
 
+        btnAddData=Button(framebutton,text="Add Data",font=("times new roman",12,"bold"),width=23,bg="blue",fg="white")
+        btnAddData.grid(row=0,column=0)
+
+        btnAddData=Button(framebutton,text="Show Data",font=("times new roman",12,"bold"),width=23,bg="blue",fg="white")
+        btnAddData.grid(row=0,column=1)
+
+        btnAddData=Button(framebutton,text="Update",font=("times new roman",12,"bold"),width=23,bg="blue",fg="white")
+        btnAddData.grid(row=0,column=2)
+
+        btnAddData=Button(framebutton,text="Delete",font=("times new roman",12,"bold"),width=23,bg="blue",fg="white")
+        btnAddData.grid(row=0,column=3)
+        
+        btnAddData=Button(framebutton,text="Reset",font=("times new roman",12,"bold"),width=23,bg="blue",fg="white")
+        btnAddData.grid(row=0,column=4)
+
+        btnAddData=Button(framebutton,text="Exit",font=("times new roman",12,"bold"),width=23,bg="blue",fg="white")
+        btnAddData.grid(row=0,column=0)
+
          #DATABASE FRAME
         framedata=Frame(self.root,bd=12,relief=RIDGE,padx=20,bg="powder blue")
         framedata.place(x=0,y=530,width=1280,height=155)
 
+        table_frame=Frame(framedata,bd=2,relief=RIDGE,bg="white")
+        table_frame.place(x=0,y=2,width=1200,height=125)
+
+        xscroll=ttk.Scrollbar(table_frame,orient=HORIZONTAL)
+        yscroll=ttk.Scrollbar(table_frame,orient=VERTICAL)
+
+        self.library_table=ttk.Treeview(table_frame,columns=("membertype","prnno.","title","firstname","address1",
+                                                            "address2","postid","mobile","bookid","booktitile","author","borrowdate",
+                                                            "datedue","days","laterreturnfine","dateoverdue","finalprice"),xscrollcommand=xscroll.set,yscrollcommand=yscroll.set)
+        xscroll.pack(side=BOTTOM,fill=X)
+        yscroll.pack(side=RIGHT,fill=Y)
+
+        xscroll.config(command=self.library_table.xview)
+        yscroll.config(command=self.library_table.yview)
+
+        self.library_table.heading("membertype",text="Member Type")
+        self.library_table.heading("prnno.",text="PRN no.")
+        self.library_table.heading("title",text="Title")
+        self.library_table.heading("firstname",text="First Name")
+        self.library_table.heading("address1",text="Address 1")
+        self.library_table.heading("address2",text="Addesss 2")
+        self.library_table.heading("postid",text="Post ID")
+        self.library_table.heading("mobile",text="Mobile")
+        self.library_table.heading("bookid",text="Book ID")
+        self.library_table.heading("booktitile",text="Book Title")
+        self.library_table.heading("author",text="Author")
+        self.library_table.heading("borrowdate",text="Date Borrowed")
+        self.library_table.heading("datedue",text="Due date")
+        self.library_table.heading("days",text="Days")
+        self.library_table.heading("laterreturnfine",text="Late Return Fine")
+        self.library_table.heading("dateoverdue",text="Date Over Due")
+        self.library_table.heading("finalprice",text="Final Price")
+
+        self.library_table["show"]="headings"
+        self.library_table.pack(fill=BOTH,expand=1)
+
+        self.library_table.column("membertype",width=85)
+        self.library_table.column("prnno.",width=80)
+        self.library_table.column("title",width=80)
+        self.library_table.column("firstname",width=80)
+        self.library_table.column("address1",width=80)
+        self.library_table.column("address2",width=80)
+        self.library_table.column("postid",width=80)
+        self.library_table.column("mobile",width=80)
+        self.library_table.column("bookid",width=80)
+        self.library_table.column("booktitile",width=85)
+        self.library_table.column("author",width=80)
+        self.library_table.column("borrowdate",width=85)
+        self.library_table.column("datedue",width=80)
+        self.library_table.column("days",width=80)
+        self.library_table.column("laterreturnfine",width=95)
+        self.library_table.column("dateoverdue",width=85)
+        self.library_table.column("finalprice",width=85)
 
 if __name__ == "__main__":
     root= Tk()
