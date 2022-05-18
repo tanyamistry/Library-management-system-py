@@ -1,9 +1,11 @@
 from sqlite3 import DatabaseError
 from tkinter import *
 from tkinter import ttk
+import tkinter
 import mysql.connector
 from tkinter import messagebox
 import datetime
+from numpy import delete
 
 from pandas import DataFrame
 class LibraryManagementSystem:
@@ -293,20 +295,20 @@ class LibraryManagementSystem:
         btnAddData=Button(framebutton,command=self.add_data,text="Add Data",font=("times new roman",12,"bold"),width=15,bg="blue",fg="white")
         btnAddData.grid(row=0,column=0)
 
-        btnAddData=Button(framebutton,text="Show Data",font=("times new roman",12,"bold"),width=15,bg="blue",fg="white")
-        btnAddData.grid(row=0,column=1)
+        btnShowData=Button(framebutton,command=self.show_data,text="Show Data",font=("times new roman",12,"bold"),width=15,bg="blue",fg="white")
+        btnShowData.grid(row=0,column=1)
 
-        btnAddData=Button(framebutton,text="Update",font=("times new roman",12,"bold"),width=15,bg="blue",fg="white")
-        btnAddData.grid(row=0,column=2)
+        btnUpdateData=Button(framebutton,command=self.update,text="Update",font=("times new roman",12,"bold"),width=15,bg="blue",fg="white")
+        btnUpdateData.grid(row=0,column=2)
 
-        btnAddData=Button(framebutton,text="Delete",font=("times new roman",12,"bold"),width=15,bg="blue",fg="white")
-        btnAddData.grid(row=0,column=3)
+        btnDeleteData=Button(framebutton,command=self.delete,text="Delete",font=("times new roman",12,"bold"),width=15,bg="blue",fg="white")
+        btnDeleteData.grid(row=0,column=3)
         
-        btnAddData=Button(framebutton,text="Reset",font=("times new roman",12,"bold"),width=15,bg="blue",fg="white")
-        btnAddData.grid(row=0,column=4)
+        btnResetData=Button(framebutton,command=self.reset,text="Reset",font=("times new roman",12,"bold"),width=15,bg="blue",fg="white")
+        btnResetData.grid(row=0,column=4)
 
-        btnAddData=Button(framebutton,text="Exit",font=("times new roman",12,"bold"),width=15,bg="blue",fg="white")
-        btnAddData.grid(row=0,column=5)
+        btnExit=Button(framebutton,command=self.iExit,text="Exit",font=("times new roman",12,"bold"),width=15,bg="blue",fg="white")
+        btnExit.grid(row=0,column=5)
 
          #DATABASE FRAME
         framedata=Frame(self.root,bd=12,relief=RIDGE,padx=20,bg="powder blue")
@@ -364,6 +366,9 @@ class LibraryManagementSystem:
         self.library_table.column("dateoverdue",width=85)
         self.library_table.column("finalprice",width=85)
 
+        self.fetch_data()
+        self.library_table.bind("<ButtonRelease-1>", self.get_cursor)
+
 
     def add_data(self):
         conn=mysql.connector.connect(host="localhost",username="root",password="Sheth@1234",database="mydata")
@@ -387,9 +392,133 @@ class LibraryManagementSystem:
                                                                                                         self.finalprice_var.get()
                                                                                                         ))
         conn.commit()
+        self.fetch_data()
         conn.close()
 
         messagebox.showinfo("Success","Member has been added successfully.")
+    
+    def update(self):
+        conn=mysql.connector.connect(host="localhost",username="root",password="Sheth@1234",database="mydata")
+        my_cursor=conn.cursor()
+        my_cursor.execute("update library set membertype=%s, SAPno=%s, firstname=%s, lastname=%s, address1=%s, address2=%s, mobile=%s, bookid=%s, booktittle=%s, author=%s, borrowdate=%s, datedue=%s, laterreturnfine=%s, dateoverdue=%s, finalprice=%s where prnno=%s",(
+                                                                                                        self.member_var.get(),                                                                                                        
+                                                                                                        self.id_var.get(),
+                                                                                                        self.firstname_var.get(),
+                                                                                                        self.lastname_var.get(),
+                                                                                                        self.address1_var.get(),
+                                                                                                        self.address2_var.get(),
+                                                                                                        self.mobile_var.get(),
+                                                                                                        self.bookid_var.get(),
+                                                                                                        self.booktitle_var.get(),
+                                                                                                        self.author_var.get(),
+                                                                                                        self.dateborrowed_var.get(),
+                                                                                                        self.datedue_var.get(),
+                                                                                                        self.lateratefine_var.get(),
+                                                                                                        self.dateoverdue_var.get(),
+                                                                                                        self.finalprice_var.get(),
+                                                                                                        self.prn_var.get()
+                                                                                                        ))
+        conn.commit()
+        self.fetch_data()
+        self.reset()
+        conn.close()
+
+        messagebox.showinfo("Success", "Member has ben Updated!")
+    
+    def fetch_data(self):
+        conn=mysql.connector.connect(host="localhost",username="root",password="Sheth@1234",database="mydata")
+        my_cursor=conn.cursor()
+        my_cursor.execute("select * from library")
+        rows=my_cursor.fetchall()
+
+        if len(rows)!=0:
+            self.library_table.delete(*self.library_table.get_children())
+            for i in rows:
+                self.library_table.insert("", END, values=i)
+            conn.commit()
+        conn.close()
+
+    def get_cursor(self,event=""):
+        cursor_row=self.library_table.focus()
+        content=self.library_table.item(cursor_row)
+        row=content['values']
+
+        self.member_var.set(row[0]),
+        self.prn_var.set(row[1]),
+        self.id_var.set(row[2]),
+        self.firstname_var.set(row[3]),
+        self.lastname_var.set(row[4]),
+        self.address1_var.set(row[5]),
+        self.address2_var.set(row[6]),
+        self.mobile_var.set(row[7]),
+        self.bookid_var.set(row[8]),
+        self.booktitle_var.set(row[9]),
+        self.author_var.set(row[10]),
+        self.dateborrowed_var.set(row[11]),
+        self.datedue_var.set(row[12]),
+        self.lateratefine_var.set(row[13]),
+        self.dateoverdue_var.set(row[14]),
+        self.finalprice_var.set(row[15])
+
+    def show_data(self):
+        self.txtBox.insert(END,"Member Type:\t\t"+ self.member_var.get()+ "\n")
+        self.txtBox.insert(END,"PRN No:\t\t"+ self.prn_var.get()+ "\n")
+        self.txtBox.insert(END,"SAP No:\t\t"+ self.id_var.get()+ "\n")
+        self.txtBox.insert(END,"First Name:\t\t"+ self.firstname_var.get()+ "\n")
+        self.txtBox.insert(END,"Last Name:\t\t"+ self.lastname_var.get()+ "\n")
+        self.txtBox.insert(END,"Address 1:\t\t"+ self.address1_var.get()+ "\n")
+        self.txtBox.insert(END,"Address 2:\t\t"+ self.address2_var.get()+ "\n")
+        self.txtBox.insert(END,"Mobile No:\t\t"+ self.mobile_var.get()+ "\n")
+        self.txtBox.insert(END,"Book ID:\t\t"+ self.bookid_var.get()+ "\n")
+        self.txtBox.insert(END,"Book Title:\t\t"+ self.booktitle_var.get()+ "\n")
+        self.txtBox.insert(END,"Author:\t\t"+ self.author_var.get()+ "\n")
+        self.txtBox.insert(END,"Borrowed on:\t\t"+ self.dateborrowed_var.get()+ "\n")
+        self.txtBox.insert(END,"Due on:\t\t"+ self.datedue_var.get()+ "\n")
+        self.txtBox.insert(END,"Late Fine:\t\t"+ self.lateratefine_var.get()+ "\n")
+        self.txtBox.insert(END,"Overdue date:\t\t"+ self.dateoverdue_var.get()+ "\n")
+        self.txtBox.insert(END,"Price:\t\t"+ self.finalprice_var.get()+ "\n")
+
+    def reset(self):
+        self.member_var.set(""),
+        self.prn_var.set(""),
+        self.id_var.set(""),
+        self.firstname_var.set(""),
+        self.lastname_var.set(""),
+        self.address1_var.set(""),
+        self.address2_var.set(""),
+        self.mobile_var.set(""),
+        self.bookid_var.set(""),
+        self.booktitle_var.set(""),
+        self.author_var.set(""),
+        self.dateborrowed_var.set(""),
+        self.datedue_var.set(""),
+        self.lateratefine_var.set(""),
+        self.dateoverdue_var.set(""),
+        self.finalprice_var.set("")
+        self.txtBox.delete("1.0", END)
+    
+    def iExit(self):
+        iExit=tkinter.messagebox.askyesno("Library Management System", "Do you want to exit?")
+        if iExit>0:
+            self.root.destroy()
+            return
+
+    def delete(self):
+        if self.prn_var.get()=="" or self.id_var.get()=="":
+            messagebox.showerror("Error", "First Select the Member")
+        else:
+            conn=mysql.connector.connect(host="localhost",username="root",password="Sheth@1234",database="mydata")
+            my_cursor=conn.cursor()
+            query="delete from library where prnno=%s"
+            value=(self.prn_var.get(),)
+            my_cursor.execute(query, value)
+
+            conn.commit()
+            self.fetch_data()
+            self.reset()
+            conn.close()
+
+            messagebox.showinfo("Success","Member has been deleted!")
 
 if __name__ == "__main__":
     root= Tk()
